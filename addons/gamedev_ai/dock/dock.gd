@@ -1155,6 +1155,22 @@ func _on_input_text_changed():
 		_show_command_suggestions(current_word)
 	else:
 		command_popup.hide()
+	
+	# Auto-resize the input field based on content (capped at 10 lines)
+	var line_height = input_field.get_line_height()
+	var total_visual_lines = 0
+	for i in range(input_field.get_line_count()):
+		total_visual_lines += 1 + input_field.get_line_wrapping_count(i)
+	
+	var stylebox = input_field.get_theme_stylebox("normal")
+	var v_padding = stylebox.content_margin_top + stylebox.content_margin_bottom if stylebox else 24
+	
+	var min_height = 120
+	var content_height = total_visual_lines * line_height + v_padding
+	var ten_line_max = 10 * line_height + v_padding
+	
+	var new_height = clamp(content_height, min_height, ten_line_max)
+	input_field.custom_minimum_size = Vector2(0, new_height)
 
 func _show_command_suggestions(prefix: String):
 	command_popup.clear()
